@@ -12,10 +12,8 @@
 use Date::Calc qw(Delta_Days);
 
 if(@ARGV==2){
-    unless($ARGV[1] =~ /^\d{1,4}-\d{1,2}-\d{1,2}$/){
-        die "$ARGV[1]: Invalid date format. Please use YYYY-MM-DD\n" 
-    } # No leading zeroes required as in ISO-8601
-    ($year2,$month2,$day2)=split(/-/, $ARGV[1]) 
+    checkdate($ARGV[1]);
+    ($year2,$month2,$day2)=split(/-/, $ARGV[1]);
 } elsif(@ARGV==1) {
     ($year2,$month2,$day2)=(localtime)[5,4,3];
     $year2+=1900; # Correct the year provided by localtime
@@ -24,12 +22,17 @@ if(@ARGV==2){
      die "Usage: YYYY-MM-DD [YYYY-MM-DD]\n";
 }
 
+checkdate($ARGV[0]);
 ($year1,$month1,$day1)=split(/-/, $ARGV[0]);
-unless($ARGV[0] =~ /^\d{1,4}-\d{1,2}-\d{1,2}$/){
-    die "$ARGV[0]: Invalid date format. Please use YYYY-MM-DD\n" 
-}
 
 eval { $days=Delta_Days($year1,$month1,$day1,$year2,$month2,$day2) };
 die "Error: Illegal date.\n" if $@; # Verify that dates actually exist!
 $days=abs($days); # Do not use negative numbers
 print "$days\n";
+
+sub checkdate {
+    $date=shift;
+    unless($date =~ /^\d{1,4}-\d{1,2}-\d{1,2}$/){
+        die "$date: Invalid date format. Please use YYYY-MM-DD\n" 
+    } # No leading zeroes required as in ISO-8601
+}
